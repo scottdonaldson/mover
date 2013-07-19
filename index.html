@@ -56,24 +56,30 @@
 <body>
 	<div id="map"></div>
 
+	<script src="jquery.min.js"></script>
 	<script>
-		var map = document.getElementById('map');
+		var map = $('#map');
 
 		for (var i = 0; i < 225; i++) {
-			var tile = document.createElement('div');
+			var tile = $('<div class="tile">');
 
-			tile.className = 'tile';
-			tile.id = i == 224 ? 'last' : '';
-			tile.setAttribute('data-x', 5);
+			if (i == 224) { tile.attr('id', 'last'); }
+			tile.attr('data-x', i % 15 + 1);
+			tile.attr('data-y', Math.floor(i / 15) + 1);
 
-			map.appendChild(tile);
+			map.append(tile);
 		}
 
-		var marker = document.createElement('div');
-		marker.className = 'marker';
-		marker.style.left = '5px';
-		marker.style.top = '5px';
-		map.appendChild(marker);
+		var marker = $('<div class="marker">');
+
+		marker.css({
+			left: 5,
+			top: 5
+		})
+		marker.attr('data-x', 1);
+		marker.attr('data-y', 1);
+
+		map.append(marker);
 
 		var isMoving = false;
 		function move(dir, inc) {
@@ -82,16 +88,28 @@
 
 			switch (dir) {
 				case 'up':
-					marker.style.top = (parseInt(marker.style.top) - 1) + 'px';
+					if (marker.attr('data-y') > 1) {
+						marker.css('top', parseInt(marker.style.top) - 1);
+						var attr = 'data-y'; var amt = -1;
+					}
 					break;
 				case 'right':
-					marker.style.left = (parseInt(marker.style.left) + 1) + 'px';
+					if (marker.attr('data-x') < 15) {
+						marker.css('left', parseInt(marker.style.left) + 1);
+						var attr = 'data-x'; var amt = 1;
+					}
 					break;
 				case 'down':
-					marker.style.top = (parseInt(marker.style.top) + 1) + 'px';
+					if (marker.attr('data-y') < 15) {
+						marker.css('top', parseInt(marker.style.top) + 1);
+						var attr = 'data-y'; var amt = 1;
+					}
 					break;
 				case 'left':
-					marker.style.left = (parseInt(marker.style.left) - 1) + 'px';
+					if (marker.attr('data-x') > 1) {
+						marker.css('left', parseInt(marker.style.left) - 1);
+						var attr = 'data-x'; var amt = -1;
+					}
 					break;
 			}
 			if (inc < 20) {
@@ -100,20 +118,17 @@
 				}, 5);
 
 			} else {
+				marker.attr(attr, parseInt(marker.attr(attr)) + amt);
 				isMoving = false;
 				inc = 0;
 			}
 		}
-		var keys = [37, 38, 39, 40];
-		document.addEventListener('keydown', function(e){
-			if (keys[e.keyCode]) { e.preventDefault(); }
-			if (!isMoving) {
-				switch (e.keyCode) {
-					case 38: move('up', 0); break;
-					case 39: move('right', 0); break;
-					case 40: move('down', 0); break;
-					case 37: move('left', 0); break;
-				}
+		var keys = { 37: 'left', 38: 'up', 39: 'right', 40: 'down' };
+		$(window).keydown(function(e){
+			if (keys.hasOwnProperty(e.keyCode)) { 
+				e.preventDefault(); 
+				
+				if (!isMoving) { move(keys[e.keyCode], 0); }
 			}
 		});
 		
