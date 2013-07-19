@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Little mover</title>
+
+	<style>
+		html, body { margin: 0; padding: 0; }
+		* {
+			-webkit-box-sizing: border-box;
+			-moz-box-sizing: border-box;
+			box-sizing: border-box;
+			position: relative;
+		}
+
+		#map {
+			margin: 220px auto;
+			width: 300px;
+
+			-webkit-perspective: 400px;
+			-webkit-transform: rotateX(30deg) rotateZ(30deg);
+
+			-webkit-transform-style: preserve-3d;
+		}
+
+		.tile {
+			background: #ddd;
+			border-top: 1px solid rgba(255, 255, 255, 0.5);
+			border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+			border-right: 1px solid rgba(0, 0, 0, 0.25);
+			border-left: 1px solid rgba(255, 255, 255, 0.5);
+			float: left;
+			height: 20px;
+			/* -webkit-transform: rotateY(-90deg); */
+			-webkit-transform-origin: 0 0;
+			width: 20px;
+		}
+
+		#tilted {
+			/* background: #f00;
+			-webkit-transform: rotateY(-90deg); */
+		}
+
+		.tile:nth-child(2n+1) { background: #aaa; }
+
+		.marker {
+			background: #f00;
+			border-radius: 10px;
+			box-shadow: 0 0 5px #000;
+			position: absolute;
+			height: 10px;
+			width: 10px;
+		}
+	</style>
+</head>
+<body>
+	<div id="map"></div>
+
+	<script>
+		var map = document.getElementById('map');
+
+		for (var i = 0; i < 225; i++) {
+			var tile = document.createElement('div');
+
+			tile.className = 'tile';
+			tile.id = i == 224 ? 'last' : '';
+			tile.setAttribute('data-x', 5);
+
+			map.appendChild(tile);
+		}
+
+		var marker = document.createElement('div');
+		marker.className = 'marker';
+		marker.style.left = '5px';
+		marker.style.top = '5px';
+		map.appendChild(marker);
+
+		var isMoving = false;
+		function move(dir, inc) {
+			isMoving = true;
+			inc++;
+
+			switch (dir) {
+				case 'up':
+					marker.style.top = (parseInt(marker.style.top) - 1) + 'px';
+					break;
+				case 'right':
+					marker.style.left = (parseInt(marker.style.left) + 1) + 'px';
+					break;
+				case 'down':
+					marker.style.top = (parseInt(marker.style.top) + 1) + 'px';
+					break;
+				case 'left':
+					marker.style.left = (parseInt(marker.style.left) - 1) + 'px';
+					break;
+			}
+			if (inc < 20) {
+				setTimeout(function(){
+					move(dir, inc);
+				}, 5);
+
+			} else {
+				isMoving = false;
+				inc = 0;
+			}
+		}
+		var keys = [37, 38, 39, 40];
+		document.addEventListener('keydown', function(e){
+			if (keys[e.keyCode]) { e.preventDefault(); }
+			if (!isMoving) {
+				switch (e.keyCode) {
+					case 38: move('up', 0); break;
+					case 39: move('right', 0); break;
+					case 40: move('down', 0); break;
+					case 37: move('left', 0); break;
+				}
+			}
+		});
+		
+	</script>
+</body>
+</html>
