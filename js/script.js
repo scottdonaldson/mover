@@ -53,15 +53,15 @@ $(document).ready(function(){
 	};
 
 	var isMoving = false;
-	function move(key) {
+	function move(e, key) {
 		isMoving = true;
-
-		bound = key.amt === -1 ? 1 : 15;
-		if ( 1===1/* statement to make sure we're within boundaries */ ) {
+		// Marker must always stay within bounds
+		if ( ([37,38].indexOf(e.keyCode) > -1) && (marker.attr('data-' + key.dir) > 1) || 
+			 ([39,40].indexOf(e.keyCode) > -1) && (marker.attr('data-' + key.dir) < 15) ) {
 			marker.css(key.dir, parseInt(marker.css(key.dir)) + 20 * key.amt);
+		
+			marker.attr('data-' + key.dir, parseInt(marker.attr('data-' + key.dir)) + key.amt);
 		}
-
-		marker.attr('data-' + key.dir, parseInt(marker.attr('data-' + key.dir)) + key.amt);
 		setTimeout(function(){ 
 			isMoving = false; 
 			specialThings();
@@ -94,7 +94,7 @@ $(document).ready(function(){
 		if (keys.hasOwnProperty(e.keyCode)) { 
 			e.preventDefault(); 
 			
-			if (!isMoving) { move(keys[e.keyCode]); }
+			if (!isMoving) { move(e, keys[e.keyCode]); }
 		}
 	});
 
