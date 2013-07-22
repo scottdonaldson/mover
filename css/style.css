@@ -30,6 +30,7 @@ html, body { margin: 0; padding: 0; }
 }
 
 .tile:nth-child(2n+1) { background: #aaa; }
+.tile.golden { background: #ff0; }
 
 .marker {
 	background: #f00;

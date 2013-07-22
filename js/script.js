@@ -4,20 +4,26 @@ $(document).ready(function(){
 	var map = $('#map');
 
 	function createMap(num) {
+
+		randomTile = Math.floor(Math.random() * num);
+
 		for (var i = 0; i < num; i++) {
 			var tile = $('<div class="tile">');
 
-			if (i == num - 1) { tile.attr('id', 'last'); }
+			if (i === num - 1) { tile.attr('id', 'last'); }
 			// NOTE: 15 is hard-coded in: this should probably be based on the number of tiles somehow...
 			// also should adjust CSS accordingly
 			tile.attr('data-left', i % 15 + 1);
 			tile.attr('data-top', Math.floor(i / 15) + 1);
 
+			if (i === randomTile) { tile.addClass('golden'); }
+
 			map.append(tile);
 		}
 	}
 	createMap(225);
-	
+	var tiles = $('.tile');
+
 	// Create the marker, position it, add data attributes for location, and add it to the map
 	var marker = $('<div class="marker">');
 
@@ -55,8 +61,33 @@ $(document).ready(function(){
 			marker.css(key.dir, parseInt(marker.css(key.dir)) + 20 * key.amt);
 		}
 
-		marker.attr('data-' + key.axis, parseInt(marker.attr('data-' + key.axis)) + key.amt);
-		setTimeout(function(){ isMoving = false; }, 200);
+		marker.attr('data-' + key.dir, parseInt(marker.attr('data-' + key.dir)) + key.amt);
+		setTimeout(function(){ 
+			isMoving = false; 
+			specialThings();
+		}, 200);
+	}
+
+	// Special things.
+	function specialThings() {
+
+		var golden = $('.golden');
+		
+		if (golden.attr('data-top') === marker.attr('data-top') && golden.attr('data-left') === marker.attr('data-left')) {
+			golden.removeClass('golden');
+
+			function createPseudoRandom() {
+				var pseudoRandom = Math.floor(Math.random() * 225);
+				if (Math.abs(parseInt(golden.attr('data-left')) - pseudoRandom % 15 + 1) <= 3 || Math.abs(parseInt(golden.attr('data-top')) - Math.floor(pseudoRandom / 15) + 1) <= 3) {
+					return createPseudoRandom();
+				} else {
+					return pseudoRandom;
+				}
+			}
+			randomTile = createPseudoRandom();
+
+			tiles.eq(randomTile).addClass('golden');
+		}
 	}
 	
 	$(window).keydown(function(e){
